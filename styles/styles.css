@@ -1,0 +1,46 @@
+.products {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .product {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    width: 200px;
+  }
+  .qty-controls {
+    display: inline-flex;
+    gap: 5px;
+    margin: 0 10px;
+  }
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  form input, form textarea {
+    display: block;
+    margin-bottom: 10px;
+    padding: 8px;
+    width: 100%;
+  }
+  form button {
+    background: green;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+  }
+
+  nav {
+    margin-bottom: 20px;
+  }
+  nav a {
+    margin-right: 15px;
+    text-decoration: none;
+    color: #333;
+  }
+  
+  
+  
+  
