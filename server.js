@@ -1,37 +1,45 @@
-// server.js
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-
-// Middleware
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-// POST /checkout
-app.post('/checkout', (req, res) => {
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch(err => console.error("❌ DB error", err));
+
+const Order = mongoose.model("Order", new mongoose.Schema({
+  customer: {
+    name: String,
+    email: String,
+    address: String,
+  },
+  cart: Array,
+  total: Number,
+  createdAt: { type: Date, default: Date.now }
+}));
+
+app.get("/", (req, res) => res.send("Checkout API Live"));
+
+app.post("/checkout", async (req, res) => {
   const { cart, customer, total } = req.body;
 
-  if (!cart || !customer || typeof total !== 'number') {
-    return res.status(400).json({ error: 'Missing or invalid data' });
+  if (!cart?.length || !customer?.name || !customer?.email || !customer?.address) {
+    return res.status(400).json({ error: "Invalid data" });
   }
 
-  console.log('New Order Received:');
-  console.log('Customer:', customer);
-  console.log('Cart:', cart);
-  console.log('Total:', total);
-
-  // TODO: Save to DB (MongoDB, etc.)
-
-  return res.status(200).json({ message: 'Order received successfully' });
+  try {
+    const order = new Order({ cart, customer, total });
+    await order.save();
+    return res.status(200).json({ message: "✅ Order saved successfully" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Server error" });
+  }
 });
 
-// Test route
-app.get('/', (req, res) => res.send('Checkout API Live'));
-
-app.listen(PORT, () => {
-  console.log('Server running at http://localhost:${PORT}');
-});
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server at http://localhost:${PORT}`));
